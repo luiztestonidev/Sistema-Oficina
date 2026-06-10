@@ -1,5 +1,8 @@
 package com.oficina.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Veiculo {
 
     private String placa;
@@ -7,6 +10,7 @@ public class Veiculo {
     private String modelo;
     private int anoFabricacao;
     private Cliente cliente;
+    private List<OrdemServico> ordensServico;
 
     public Veiculo(String placa, String marca, String modelo, int anoFabricacao,  Cliente cliente) {
         this.placa = placa;
@@ -14,6 +18,15 @@ public class Veiculo {
         this.modelo = modelo;
         this.anoFabricacao = anoFabricacao;
         this.cliente = cliente;
+        this.ordensServico = new ArrayList<>();
+    }
+
+    public void adicionarOrdemServico(OrdemServico ordemServico) {
+        this.ordensServico.add(ordemServico);
+    }
+
+    public List<OrdemServico> getOrdensServicos() {
+        return ordensServico;
     }
 
     public String getPlaca() {
