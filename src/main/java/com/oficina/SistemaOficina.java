@@ -1,6 +1,7 @@
 package com.oficina;
 
 import com.oficina.model.Cliente;
+import com.oficina.model.OrdemServico;
 import com.oficina.model.Veiculo;
 
 import java.util.ArrayList;
@@ -39,6 +40,9 @@ public class SistemaOficina {
                 case 4:
                     listarVeiculos();
                     break;
+                case 5:
+                    criarOrdemServico();
+                    break;
                 case 0:
                     System.out.println("\nEncerrando sistema...");
                     break;
@@ -56,6 +60,7 @@ public class SistemaOficina {
         System.out.println("2 - Listar clientes");
         System.out.println("3 - Cadastrar veiculo");
         System.out.println("4 - Listar veiculos");
+        System.out.println("5 - Criar ordem de servico");
         System.out.println("0 - Sair");
         System.out.print("Opcao: ");
 
@@ -144,11 +149,58 @@ public class SistemaOficina {
             }
 
             for (Veiculo veiculo : cliente.getVeiculos()) {
+                System.out.println("\nDescricao veiculo");
                 System.out.println("Placa: " + veiculo.getPlaca());
                 System.out.println("Marca: " + veiculo.getMarca());
                 System.out.println("Modelo: " + veiculo.getModelo());
                 System.out.println("Ano: " + veiculo.getAnoFabricacao());
             }
         }
+    }
+
+    private void criarOrdemServico() {
+
+        if (clientes.isEmpty()) {
+            System.out.println("\nNenhum cliente cadastrado!");
+            return;
+        }
+
+        for (int i = 0; i < clientes.size(); i++) {
+            System.out.println(i + 1 + " - " + clientes.get(i).getNome());
+        }
+
+        System.out.print("Escolha o cliente: ");
+        int clienteIndex = sc.nextInt();
+        sc.nextLine();
+
+        Cliente cliente = clientes.get(clienteIndex - 1);
+
+        if (cliente.getVeiculos().isEmpty()) {
+            System.out.println("Esse cliente nao possui veiculos!");
+            return;
+        }
+
+        List<Veiculo> veiculos = cliente.getVeiculos();
+
+        for (int i = 0; i < veiculos.size(); i++) {
+            System.out.println(i + 1 + " - " + veiculos.get(i).getPlaca() + " | " + veiculos.get(i).getModelo());
+        }
+
+        System.out.print("Escolha o veiculo: ");
+        int veiculoIndex = sc.nextInt();
+        sc.nextLine();
+
+        Veiculo veiculo = veiculos.get(veiculoIndex - 1);
+
+        System.out.print("Descricao: ");
+        String descricao = sc.nextLine();
+
+        System.out.print("Valor: ");
+        double valor = sc.nextDouble();
+        sc.nextLine();
+
+        OrdemServico os = new OrdemServico ((int)(Math.random() * 1000), veiculo, descricao, valor, "ABERTA") ;
+        veiculo.adicionarOrdemServico(os);
+        System.out.println("Ordem de servico criada com sucesso!");
     }
 }
