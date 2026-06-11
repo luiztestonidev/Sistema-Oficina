@@ -43,6 +43,9 @@ public class SistemaOficina {
                 case 5:
                     criarOrdemServico();
                     break;
+                case 6:
+                    listarOrdemServico();
+                    break;
                 case 0:
                     System.out.println("\nEncerrando sistema...");
                     break;
@@ -61,14 +64,31 @@ public class SistemaOficina {
         System.out.println("3 - Cadastrar veiculo");
         System.out.println("4 - Listar veiculos");
         System.out.println("5 - Criar ordem de servico");
+        System.out.println("6 - Listar ordem de servico");
         System.out.println("0 - Sair");
         System.out.print("Opcao: ");
 
     }
 
+    private void exibirTitulo(String titulo) {
+
+        int largura = 40;
+
+        System.out.println();
+        System.out.println("=".repeat(largura));
+
+        int espacos = (largura - titulo.length()) / 2;
+        System.out.println(" ".repeat(espacos) + titulo);
+
+        System.out.println("=".repeat(largura));
+        System.out.println();
+    }
+
     private void cadastrarCliente() {
 
-        System.out.print("\nNome do cliente: ");
+        exibirTitulo("CADASTRO DE CLIENTE");
+
+        System.out.print("Nome do cliente: ");
         String nome = sc.nextLine();
 
         System.out.print("CPF do cliente: ");
@@ -84,16 +104,19 @@ public class SistemaOficina {
 
     private void listarClientes() {
 
+        exibirTitulo("LISTA DE CLIENTES");
+
         if (clientes.isEmpty()) {
-            System.out.println("\nNenhum cliente cadastrado!");
+            System.out.println("Nenhum cliente cadastrado!");
             return;
         }
 
         for (Cliente cliente : clientes) {
 
-            System.out.println("\nNome do cliente: " + cliente.getNome());
+            System.out.println("Nome do cliente: " + cliente.getNome());
             System.out.println("CPF do cliente: " + cliente.getCpf());
             System.out.println("Telefone: " + cliente.getTelefone());
+            System.out.println();
         }
     }
 
@@ -104,7 +127,8 @@ public class SistemaOficina {
             return;
         }
 
-        System.out.println("\nClientes cadastrados:");
+        exibirTitulo("CADASTRO DE VEICULOS");
+
         for (int i = 0; i < clientes.size(); i++) {
             System.out.println(i + 1 + " - " + clientes.get(i).getNome());
         }
@@ -121,10 +145,10 @@ public class SistemaOficina {
         System.out.print("Digite a marca do veiculo: ");
         String marca =  sc.nextLine();
 
-        System.out.print("Digite a modelo do veiculo: ");
+        System.out.print("Digite o modelo do veiculo: ");
         String modelo =  sc.nextLine();
 
-        System.out.print("Digite a ano de fabricacao do veiculo: ");
+        System.out.print("Digite o ano de fabricacao do veiculo: ");
         int anoFabricacao = sc.nextInt();
         sc.nextLine();
 
@@ -141,19 +165,22 @@ public class SistemaOficina {
             return;
         }
 
+        exibirTitulo("LISTA DE VEICULOS");
+
         for (Cliente cliente : clientes) {
-            System.out.println("\nNome cliente: " + cliente.getNome());
+            System.out.println("Cliente: " + cliente.getNome());
 
             if (cliente.getVeiculos().isEmpty()) {
                 System.out.println("Nenhum veiculo cadastrado!");
             }
 
             for (Veiculo veiculo : cliente.getVeiculos()) {
-                System.out.println("\nDescricao veiculo");
+                System.out.println("\nDados do veiculo de(a) " + cliente.getNome());
                 System.out.println("Placa: " + veiculo.getPlaca());
                 System.out.println("Marca: " + veiculo.getMarca());
                 System.out.println("Modelo: " + veiculo.getModelo());
                 System.out.println("Ano: " + veiculo.getAnoFabricacao());
+                System.out.println();
             }
         }
     }
@@ -164,6 +191,8 @@ public class SistemaOficina {
             System.out.println("\nNenhum cliente cadastrado!");
             return;
         }
+
+        exibirTitulo("CRIAR ORDEM DE SERVICO");
 
         for (int i = 0; i < clientes.size(); i++) {
             System.out.println(i + 1 + " - " + clientes.get(i).getNome());
@@ -202,5 +231,45 @@ public class SistemaOficina {
         OrdemServico os = new OrdemServico ((int)(Math.random() * 1000), veiculo, descricao, valor, "ABERTA") ;
         veiculo.adicionarOrdemServico(os);
         System.out.println("Ordem de servico criada com sucesso!");
+    }
+
+    private void listarOrdemServico() {
+
+        if (clientes.isEmpty()) {
+            System.out.println("\nNenhum cliente cadastrado!");
+            return;
+        }
+
+        exibirTitulo("LISTA DE ORDEM DE SERVICO");
+
+        for (int i = 0; i < clientes.size(); i++) {
+
+            Cliente cliente = clientes.get(i);
+                System.out.println(i + 1 + " - " + clientes.get(i).getNome());
+
+            if (cliente.getVeiculos().isEmpty()) {
+                System.out.println("Nenhum veiculo cadastrado!\n");
+                continue;
+            }
+
+            for (Veiculo veiculo : cliente.getVeiculos()) {
+                System.out.println("Placa: " + veiculo.getPlaca());
+                System.out.println("Marca: " + veiculo.getMarca());
+                System.out.println("Modelo: " + veiculo.getModelo());
+                System.out.println("Ano de fabricacao: " + veiculo.getAnoFabricacao());
+
+                if (veiculo.getOrdensServicos().isEmpty()) {
+                    System.out.println("Nenhuma OS cadastrada!\n");
+                    continue;
+                }
+
+                for (OrdemServico ordemServico : veiculo.getOrdensServicos()) {
+                    System.out.println("\nOS #" + ordemServico.getNumero());
+                    System.out.println("Descricao: " + ordemServico.getDescricao());
+                    System.out.printf("Valor: R$ %.2f%n" , ordemServico.getValor());
+                    System.out.println("Status: " + ordemServico.getStatus());
+                }
+            }
+        }
     }
 }
