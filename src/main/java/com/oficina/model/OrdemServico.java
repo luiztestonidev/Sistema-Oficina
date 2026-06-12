@@ -5,10 +5,10 @@ public class OrdemServico {
     private final int numero;
     private String descricao;
     private double valor;
-    private String status;
+    private StatusOrdemServico status;
     private final Veiculo veiculo;
 
-    public OrdemServico(int numero, Veiculo veiculo, String descricao, double valor, String status) {
+    public OrdemServico(int numero, Veiculo veiculo, String descricao, double valor, StatusOrdemServico status) {
         this.numero = numero;
         this.veiculo = veiculo;
         this.descricao = descricao;
@@ -28,7 +28,7 @@ public class OrdemServico {
         return valor;
     }
 
-    public String getStatus() {
+    public StatusOrdemServico getStatus() {
         return status;
     }
 
@@ -44,7 +44,7 @@ public class OrdemServico {
         this.valor = valor;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusOrdemServico status) {
         this.status = status;
     }
 }

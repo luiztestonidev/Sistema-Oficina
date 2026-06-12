@@ -2,6 +2,7 @@ package com.oficina;
 
 import com.oficina.model.Cliente;
 import com.oficina.model.OrdemServico;
+import com.oficina.model.StatusOrdemServico;
 import com.oficina.model.Veiculo;
 
 import java.util.ArrayList;
@@ -10,12 +11,14 @@ import java.util.Scanner;
 
 public class SistemaOficina {
 
-    private Scanner sc;
-    private List<Cliente> clientes;
+    private final Scanner sc;
+    private final List<Cliente> clientes;
+    private int proximoNumeroOs;
 
     public SistemaOficina() {
         this.sc = new Scanner(System.in);
         this.clientes = new ArrayList<>();
+        this.proximoNumeroOs = 1;
     }
 
     public void iniciar() {
@@ -24,8 +27,7 @@ public class SistemaOficina {
 
         do {
             exibirMenu();
-            opcao = sc.nextInt();
-            sc.nextLine();
+            opcao = lerOpcaoValida(7)
 
             switch (opcao) {
                 case 1:
@@ -46,10 +48,13 @@ public class SistemaOficina {
                 case 6:
                     listarOrdemServico();
                     break;
+                case 7:
+                    alterarStatusOrdemServico();
+                    break;
                 case 0:
                     System.out.println("\nEncerrando sistema...");
                     break;
-                    
+
                 default:
                     System.out.println("Opcao invalida");
             }
@@ -65,6 +70,7 @@ public class SistemaOficina {
         System.out.println("4 - Listar veiculos");
         System.out.println("5 - Criar ordem de servico");
         System.out.println("6 - Listar ordem de servico");
+        System.out.println("7 - Alterar status da OS");
         System.out.println("0 - Sair");
         System.out.print("Opcao: ");
 
@@ -84,6 +90,27 @@ public class SistemaOficina {
         System.out.println();
     }
 
+    private int lerOpcaoValida(int limiteMaximo) {
+
+        while (true) {
+
+            try {
+                int opcao = sc.nextInt();
+                sc.nextLine();
+
+                if (opcao >= 1 && opcao <= limiteMaximo) {
+                    return opcao;
+                }
+
+                System.out.print("Opcao invalida. Tente novamente: ");
+
+            } catch (Exception e) {
+                System.out.print("Digite apenas numeros: ");
+                sc.nextLine();
+            }
+        }
+    }
+
     private void cadastrarCliente() {
 
         exibirTitulo("CADASTRO DE CLIENTE");
@@ -97,7 +124,7 @@ public class SistemaOficina {
         System.out.print("Telefone: ");
         String telefone = sc.nextLine();
 
-        Cliente cliente = new Cliente(nome,cpf,telefone);
+        Cliente cliente = new Cliente(nome, cpf, telefone);
         clientes.add(cliente);
         System.out.println("Cliente cadastrado com sucesso!");
     }
@@ -113,8 +140,8 @@ public class SistemaOficina {
 
         for (Cliente cliente : clientes) {
 
-            System.out.println("Nome do cliente: " + cliente.getNome());
-            System.out.println("CPF do cliente: " + cliente.getCpf());
+            System.out.println("Cliente: " + cliente.getNome());
+            System.out.println("CPF: " + cliente.getCpf());
             System.out.println("Telefone: " + cliente.getTelefone());
             System.out.println();
         }
@@ -134,8 +161,7 @@ public class SistemaOficina {
         }
 
         System.out.print("Escolha o cliente: ");
-        int clienteVeiculo = sc.nextInt();
-        sc.nextLine();
+        int clienteVeiculo = lerOpcaoValida(clientes.size());
 
         Cliente clienteEscolhido = clientes.get(clienteVeiculo - 1);
 
@@ -143,10 +169,10 @@ public class SistemaOficina {
         String placa = sc.nextLine();
 
         System.out.print("Digite a marca do veiculo: ");
-        String marca =  sc.nextLine();
+        String marca = sc.nextLine();
 
         System.out.print("Digite o modelo do veiculo: ");
-        String modelo =  sc.nextLine();
+        String modelo = sc.nextLine();
 
         System.out.print("Digite o ano de fabricacao do veiculo: ");
         int anoFabricacao = sc.nextInt();
@@ -199,8 +225,7 @@ public class SistemaOficina {
         }
 
         System.out.print("Escolha o cliente: ");
-        int clienteIndex = sc.nextInt();
-        sc.nextLine();
+        int clienteIndex = lerOpcaoValida(clientes.size());
 
         Cliente cliente = clientes.get(clienteIndex - 1);
 
@@ -216,8 +241,7 @@ public class SistemaOficina {
         }
 
         System.out.print("Escolha o veiculo: ");
-        int veiculoIndex = sc.nextInt();
-        sc.nextLine();
+        int veiculoIndex = lerOpcaoValida(veiculos.size());
 
         Veiculo veiculo = veiculos.get(veiculoIndex - 1);
 
@@ -228,7 +252,7 @@ public class SistemaOficina {
         double valor = sc.nextDouble();
         sc.nextLine();
 
-        OrdemServico os = new OrdemServico ((int)(Math.random() * 1000), veiculo, descricao, valor, "ABERTA") ;
+        OrdemServico os = new OrdemServico(proximoNumeroOs++, veiculo, descricao, valor, StatusOrdemServico.ABERTA);
         veiculo.adicionarOrdemServico(os);
         System.out.println("Ordem de servico criada com sucesso!");
     }
@@ -243,33 +267,121 @@ public class SistemaOficina {
         exibirTitulo("LISTA DE ORDEM DE SERVICO");
 
         for (int i = 0; i < clientes.size(); i++) {
+            System.out.println(i + 1 + " - " + clientes.get(i).getNome());
+        }
 
-            Cliente cliente = clientes.get(i);
-                System.out.println(i + 1 + " - " + clientes.get(i).getNome());
+        System.out.print("Escolha o cliente: ");
+        int clienteIndex = lerOpcaoValida(clientes.size());
 
-            if (cliente.getVeiculos().isEmpty()) {
-                System.out.println("Nenhum veiculo cadastrado!\n");
+        Cliente cliente = clientes.get(clienteIndex - 1);
+
+        System.out.println("\nCliente: " + cliente.getNome());
+
+        if (cliente.getVeiculos().isEmpty()) {
+            System.out.println("Nenhum veiculo cadastrado!");
+            return;
+        }
+
+        for (Veiculo veiculo : cliente.getVeiculos()) {
+
+            System.out.println("\nDados do veiculo:");
+            System.out.println("Placa: " + veiculo.getPlaca());
+            System.out.println("Marca: " + veiculo.getMarca());
+            System.out.println("Modelo: " + veiculo.getModelo());
+            System.out.println("Ano de fabricacao: " + veiculo.getAnoFabricacao());
+
+            if (veiculo.getOrdensServicos().isEmpty()) {
+                System.out.println("Nenhuma OS cadastrada!");
                 continue;
             }
 
-            for (Veiculo veiculo : cliente.getVeiculos()) {
-                System.out.println("Placa: " + veiculo.getPlaca());
-                System.out.println("Marca: " + veiculo.getMarca());
-                System.out.println("Modelo: " + veiculo.getModelo());
-                System.out.println("Ano de fabricacao: " + veiculo.getAnoFabricacao());
-
-                if (veiculo.getOrdensServicos().isEmpty()) {
-                    System.out.println("Nenhuma OS cadastrada!\n");
-                    continue;
-                }
-
-                for (OrdemServico ordemServico : veiculo.getOrdensServicos()) {
-                    System.out.println("\nOS #" + ordemServico.getNumero());
-                    System.out.println("Descricao: " + ordemServico.getDescricao());
-                    System.out.printf("Valor: R$ %.2f%n" , ordemServico.getValor());
-                    System.out.println("Status: " + ordemServico.getStatus());
-                }
+            for (OrdemServico ordemServico : veiculo.getOrdensServicos()) {
+                System.out.println("\nOS #" + ordemServico.getNumero());
+                System.out.println("Descricao: " + ordemServico.getDescricao());
+                System.out.printf("Valor: R$ %.2f%n", ordemServico.getValor());
+                System.out.println("Status: " + ordemServico.getStatus());
             }
         }
+    }
+
+    private void alterarStatusOrdemServico() {
+
+        if (clientes.isEmpty()) {
+            System.out.println("\nNenhum cliente cadastrado!");
+            return;
+        }
+
+        exibirTitulo("ALTERAR STATUS DE ORDEM DE SERVICO");
+
+        for (int i = 0; i < clientes.size(); i++) {
+            System.out.println((i + 1) + " - " + clientes.get(i).getNome());
+        }
+
+        System.out.print("Escolha o cliente: ");
+        int clienteIndex = lerOpcaoValida(clientes.size());
+
+        Cliente cliente = clientes.get(clienteIndex - 1);
+
+        if (cliente.getVeiculos().isEmpty()) {
+            System.out.println("Nenhum veículo cadastrado para este cliente!");
+            return;
+        }
+
+        System.out.println("\nVeículos do cliente:");
+
+        List<Veiculo> veiculos = cliente.getVeiculos();
+
+        for (int i = 0; i < veiculos.size(); i++) {
+            Veiculo veiculo = veiculos.get(i);
+
+            System.out.println((i + 1) + " - " + veiculo.getPlaca() + " | " + veiculo.getModelo());
+        }
+
+        System.out.print("Escolha o veículo: ");
+        int veiculoIndex = lerOpcaoValida(veiculos.size());
+
+        Veiculo veiculo = veiculos.get(veiculoIndex - 1);
+
+        if (veiculo.getOrdensServicos().isEmpty()) {
+            System.out.println("Nenhuma OS cadastrada para este veículo!");
+            return;
+        }
+
+        List<OrdemServico> ordensServicos = veiculo.getOrdensServicos();
+
+        System.out.println("\nOrdens de Serviço:");
+
+        for (int i = 0; i < ordensServicos.size(); i++) {
+
+            OrdemServico ordemServico = ordensServicos.get(i);
+
+            System.out.println((i + 1) + " - OS #" + ordemServico.getNumero() + " | " + ordemServico.getStatus());
+        }
+
+        System.out.print("Escolha a OS: ");
+        int ordemServicoIndex = lerOpcaoValida(ordensServicos.size());
+
+        OrdemServico ordemServico = ordensServicos.get(ordemServicoIndex - 1);
+
+        System.out.println("\n1 - ABERTA");
+        System.out.println("2 - EM_ANDAMENTO");
+        System.out.println("3 - FINALIZADA");
+
+        System.out.print("Novo status: ");
+        int opcaoStatus = lerOpcaoValida(3);
+
+        switch (opcaoStatus) {
+            case 1:
+                ordemServico.setStatus(StatusOrdemServico.ABERTA);
+                break;
+            case 2:
+                ordemServico.setStatus(StatusOrdemServico.EM_ANDAMENTO);
+                break;
+            case 3:
+                ordemServico.setStatus(StatusOrdemServico.FINALIZADA);
+                break;
+        }
+
+        System.out.println("\nStatus da OS #" + ordemServico.getNumero() + " alterado para " + ordemServico.getStatus());
     }
 }
